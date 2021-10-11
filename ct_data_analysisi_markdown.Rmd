@@ -1,0 +1,86 @@
+---
+title: "ct_data_analysis"
+author: "XJ"
+date: "10/11/2021"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load the Data
+
+Pay attention: 
+  * the column-name should be more easy to read or use lowercase. 
+  * To avoid to use simple name may conflict with R language internal parameters
+      
+```{r read the data}
+eol_ana <- read.csv("C:/Users/uib10158/Desktop/data_clean/ct_raw_data_clean_20211011/0_20211006_161139213_RawTarget_extract.csv")
+head(eol_ana)
+```
+
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown [click here](http://rmarkdown.rstudio.com).
+
+The raw data you can find here [raw dataset](https://www.kaggle.com/readbythebeach/datasets)
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+Pay attention:
+following static result with na data, later when static the raw date, please consider to use R na.rm=True
+
+```{r summarize the input data}
+summary(eol_ana)
+```
+
+## Import the library
+
+normally, use tidyverse is enough
+
+```{r}
+library(tidyverse)
+library(skimr)
+```
+
+
+## Analysis requirements and print out
+
+Requirements:
+  * focus on distance == 1.6
+  * separate the data by different type of Tx_Moudle
+  * summarize the angle by min, max, stand
+  * print out the result
+  
+```{r analysis the data}
+eol_ana_dis <-filter(eol_ana, distance == 1.6)
+summary(eol_ana_dis)
+
+eol_ana_dis %>% 
+  group_by(Tx_Module) %>% 
+  drop_na() %>% 
+  summarize(max_angle=max(angle,na.rm = TRUE), 
+            mean_angle=min(angle, na.rm=TRUE),
+            sd_angle=sd(angle, na.rm=TRUE))
+
+ggplot(data=eol_ana_dis)+
+  geom_point(mapping=aes(x=distance, y=angle, color=Tx_Module))+facet_wrap(~Tx_Module)
+```
+
+## save image
+
+save the image in the same folder
+```{r save image}
+ggsave("eol_ana_result.png")
+```
+
+
+
+## End
+Version 1.0 by xj
+
+
